@@ -1,62 +1,35 @@
 package xyz.decmurphy.sankeyg7r
 
-enum class HighLevelCategory(val displayName: String) {
-
-    BUDGET("Budget")
-
-    , ZALANDO("Zalando")
-    , FC("FC")
-    , OTHER_INCOME("Other Income")
-
-    , RENT("Rent")
-    , BILLS("Bills")
-    , GROCERIES("Groceries")
-    , SAVINGS("Savings")
-    , CAR("Car")
-    , PETS("Pets")
-    , EATING_OUT("Eating Out")
-    , GOING_OUT("Going Out")
-    , TRAVEL("Travel")
-
-    , OTHER("Other")
-
-    , UNCLASSIFIED_INCOME("?")
-    , UNCLASSIFIED_OUTGOING("??")
-
-    , IGNORE("Ignore")
-
+enum class MatchType {
+    MATCHES
+    , CONTAINS
+    , STARTS_WITH
+    , ENDS_WITH
 }
 
-enum class Category(val highLevelCategory: HighLevelCategory) {
-
-    BUDGET(HighLevelCategory.BUDGET)
-
-    , INCOME_JOB(HighLevelCategory.ZALANDO)
-    , INCOME_FC(HighLevelCategory.FC)
-    , INCOME_LINDA(HighLevelCategory.OTHER_INCOME)
-    , TRANSFERS_IN(HighLevelCategory.OTHER_INCOME)
-
-    , RENT(HighLevelCategory.RENT)
-    , BILLS(HighLevelCategory.BILLS)
-    , GROCERIES(HighLevelCategory.GROCERIES)
-    , SAVINGS(HighLevelCategory.SAVINGS)
-    , CAR_AND_PETROL(HighLevelCategory.CAR)
-    , PETS(HighLevelCategory.PETS)
-    , TAKEAWAY_AND_DRINKS(HighLevelCategory.EATING_OUT)
-    , GOING_OUT_AND_TAXIS(HighLevelCategory.GOING_OUT)
-    , TRAVEL(HighLevelCategory.TRAVEL)
-
-    , TRANSFERS_OUT(HighLevelCategory.OTHER)
-    , TRANSPORT(HighLevelCategory.OTHER)
-    , SUBSCRIPTIONS(HighLevelCategory.OTHER)
-    , GYM(HighLevelCategory.OTHER)
-    , CHARITY(HighLevelCategory.OTHER)
-    , FC_EXPENSES(HighLevelCategory.OTHER)
-    , MISC(HighLevelCategory.OTHER)
-
-    , UNCLASSIFIED_INCOME(HighLevelCategory.UNCLASSIFIED_INCOME)
-    , UNCLASSIFIED_OUTGOING(HighLevelCategory.UNCLASSIFIED_OUTGOING)
-
-    , IGNORE(HighLevelCategory.IGNORE)
-
+data class Match(
+    val matchType: MatchType,
+    val patterns: List<String>
+) {
+    infix fun matches(input: String): Boolean {
+        return patterns.any {
+            when (matchType) {
+                MatchType.MATCHES -> Regex(it).containsMatchIn(input)
+                MatchType.CONTAINS -> input.lowercase().contains(it.lowercase())
+                MatchType.STARTS_WITH -> input.lowercase().startsWith(it.lowercase())
+                MatchType.ENDS_WITH -> input.lowercase().endsWith(it.lowercase())
+            }
+        }
+    }
 }
+
+data class AppCategory(
+    val name: String,
+    val matches: List<Match>
+) {
+    fun matches(input: String): Boolean {
+        return matches.any { it matches input }
+    }
+}
+
+infix fun String.belongsTo(category: AppCategory) = category.matches(this)

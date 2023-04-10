@@ -1,0 +1,180 @@
+spring:
+  application:
+    name: "sankey-generator"
+  main:
+    banner-mode: console
+    allow-bean-definition-overriding: true
+  output:
+    ansi:
+      enabled: ALWAYS
+  devtools:
+    restart:
+      log-condition-evaluation-delta: false
+
+app:
+  categories:
+    - name: "Salary"
+      matches:
+        - matchType: "CONTAINS"
+          patterns:
+            - "Zalando Ireland Lt"
+    - name: "FC"
+      matches:
+        - matchType: "CONTAINS"
+          patterns:
+            - "STRIPE"
+        - matchType: "MATCHES"
+          patterns:
+            - "\\d{16}Pa"
+    - name: "From Linda"
+      matches:
+        - matchType: "STARTS_WITH"
+          patterns:
+            - "JUNE"
+    - name: "Other Income"
+      matches:
+        - matchType: "CONTAINS"
+          patterns:
+            - "Refund"
+        - matchType: "STARTS_WITH"
+          patterns:
+            - "From "
+            - "Claims "
+    - name: "Rent"
+      matches:
+        - matchType: "CONTAINS"
+          patterns:
+            - "Lansdowne Partners"
+    - name: "Bills"
+      matches:
+        - matchType: "CONTAINS"
+          patterns:
+            - "Panda Recycl"
+            - "ELECTRIC IREL"
+            - "Electric Ireland"
+            - "VIRGIN MEDIA"
+            - "VHI"
+            - "Top Dublin"
+            - "FEE: MAINTAINING ACC"
+            - "3ireland"
+    - name: "Home"
+      matches:
+        - matchType: "CONTAINS"
+          patterns:
+            - "power city"
+            - "ikea"
+            - "woodies"
+            - "woodie's"
+            - "halfords"
+            - "harvey norman"
+    - name: "Groceries"
+      matches:
+        - matchType: "CONTAINS"
+          patterns:
+            - "lidl"
+            - "tesco"
+            - "dunnes"
+            - "supervalu"
+            - "spar"
+            - "aldi"
+            - "centra"
+            - "heb "
+            - "oxxo"
+            - "applegreen"
+            - "circle k"
+            - "dealz"
+            - "eurogiant"
+            - "penneys"
+            - "sv "
+            - "oriental pantry"
+            - "daybreak"
+            - "petstop"
+            - "buckley"
+            - "o briens"
+            - "mr price"
+            - "nutgrove"
+    - name: "Pets"
+      matches:
+        - matchType: "CONTAINS"
+          patterns:
+            - "Nutgrove Veterinary"
+    - name: "Savings"
+      matches:
+        - matchType: "CONTAINS"
+          patterns:
+            - "DECLAN MURPHY      SO"
+            - "BOI savings"
+    - name: "Car"
+      matches:
+        - matchType: "CONTAINS"
+          patterns:
+            - "axa insurance"
+    - name: "Food+Drink"
+      matches:
+        - matchType: "CONTAINS"
+          patterns:
+            - "starbucks"
+            - "uber* eats pending"
+            - "diep"
+            - "camile"
+            - "mcdonalds"
+            - "nandos"
+            - "el grito"
+            - "donuts"
+            - "musashi"
+            - "deliveroo"
+            - "sprout"
+            - "insomnia"
+            - "pizza"
+            - "food"
+    - name: "Going Out"
+      matches:
+        - matchType: "CONTAINS"
+          patterns:
+            - "uber* pending"
+            - "freenow"
+            - "ferryman"
+            - "movies"
+            - "bar"
+            - "lounge"
+            - "stags head"
+            - "buck mulligans"
+            - "wrights"
+            - "mother reillys"
+            - "churchtown stores"
+            - "bottle tower"
+            - "blackbird"
+    - name: "Subscriptions"
+      matches:
+        - matchType: "CONTAINS"
+          patterns:
+            - "spotify"
+            - "nord"
+            - "subscription"
+            - "amazon prime"
+            - "netflix"
+    - name: "Gym"
+      matches:
+        - matchType: "CONTAINS"
+          patterns:
+            - "prime fitness"
+            - "gym plus"
+    - name: "Travel"
+      matches:
+        - matchType: "CONTAINS"
+          patterns:
+            - "airbnb"
+            - "hotel"
+            - "stena"
+            - "iberia express"
+            - "getyourguide"
+            - "ryanair"
+            - "aer lingus"
+    - name: "Ignore"
+      matches:
+        - matchType: "MATCHES"
+          patterns:
+            - "POS\\d{2}[A-Z]{3} Revolut"
+#        - matchType: "STARTS_WITH"
+#          patterns:
+#            - "365 Online"

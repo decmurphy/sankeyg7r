@@ -3,6 +3,7 @@ package xyz.decmurphy.sankeyg7r
 import mu.KotlinLogging
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
 import xyz.decmurphy.sankeyg7r.import.BOIImporter
 import xyz.decmurphy.sankeyg7r.import.RevolutImporter
@@ -12,6 +13,7 @@ import java.math.RoundingMode
 private val logger = KotlinLogging.logger {}
 
 @SpringBootApplication
+@ConfigurationPropertiesScan
 class Sankeyg7rApplication(
 	val boiImporter: BOIImporter,
 	val revolutImporter: RevolutImporter,
@@ -67,11 +69,11 @@ class Sankeyg7rApplication(
 
 	fun List<Entry>.categorise() = this.map {
 		it.category = categoriser.process(it.details, it.credit != null)
-		if (it.category == Category.UNCLASSIFIED_OUTGOING || it.category == Category.UNCLASSIFIED_INCOME) {
+		if (it.category == null) {
 			uncategorisedEntries.add(it)
 		}
 		it
-	}.filter { it.category != Category.IGNORE }
+	}.filter { it.category?.name?.lowercase() != "ignore" }
 
 	fun List<Entry>.sankify() = this.onEach { it.sankify() }
 

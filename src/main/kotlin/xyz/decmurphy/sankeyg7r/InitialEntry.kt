@@ -9,21 +9,22 @@ data class Entry(
     val credit: Double?,
     var balance: Double?
 ) {
-    var category: Category? = null
+    var category: AppCategory? = null
     var sankey: SankeyEntry? = null
 
     fun sankify() {
+        val categoryName = this.category?.name?.uppercase()
         if (this.credit != null)
-            this.sankey = SankeyEntry(this.category!!.highLevelCategory, this.credit, HighLevelCategory.BUDGET)
+            this.sankey = SankeyEntry(input = categoryName ?: "OTHER INCOME", amount = this.credit)
         else
-            this.sankey = SankeyEntry(HighLevelCategory.BUDGET, this.debit!!, this.category!!.highLevelCategory)
+            this.sankey = SankeyEntry(amount = this.debit!!, output = categoryName ?: "OTHER OUTGOING")
     }
 }
 
 data class SankeyEntry(
-    val input: HighLevelCategory,
     var amount: Double,
-    val output: HighLevelCategory
+    val input: String? = null,
+    val output: String? = null
 ) {
-    override fun toString(): String = "${input.displayName} [$amount] ${output.displayName}"
+    override fun toString(): String = "${input ?: "BUDGET"} [$amount] ${output ?: "BUDGET"}"
 }
