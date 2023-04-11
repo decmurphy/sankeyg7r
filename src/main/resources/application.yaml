@@ -30,7 +30,7 @@ app:
       matches:
         - matchType: "STARTS_WITH"
           patterns:
-            - "JUNE"
+            - "JUNEte amo"
     - name: "Other Income"
       matches:
         - matchType: "CONTAINS"
@@ -40,6 +40,8 @@ app:
           patterns:
             - "From "
             - "Claims "
+            - "JUNE"
+            - "1/ROSALINDA ELIZAB"
     - name: "Rent"
       matches:
         - matchType: "CONTAINS"
@@ -66,6 +68,8 @@ app:
             - "woodies"
             - "woodie's"
             - "halfords"
+            - "home store"
+            - "homebase"
             - "harvey norman"
     - name: "Groceries"
       matches:
@@ -81,15 +85,16 @@ app:
             - "heb "
             - "oxxo"
             - "applegreen"
+            - "boots"
             - "circle k"
             - "dealz"
             - "eurogiant"
-            - "penneys"
             - "sv "
             - "oriental pantry"
             - "daybreak"
             - "petstop"
             - "buckley"
+            - "butcher"
             - "o briens"
             - "mr price"
             - "nutgrove"
@@ -109,6 +114,7 @@ app:
         - matchType: "CONTAINS"
           patterns:
             - "axa insurance"
+            - "car park"
     - name: "Food+Drink"
       matches:
         - matchType: "CONTAINS"
@@ -127,13 +133,18 @@ app:
             - "insomnia"
             - "pizza"
             - "food"
+            - "yamamori"
+            - "kfc"
     - name: "Going Out"
       matches:
         - matchType: "CONTAINS"
           patterns:
+            - "ticketmaster"
             - "uber* pending"
             - "freenow"
             - "ferryman"
+            - "leopardstown inn"
+            - "harbour bar"
             - "movies"
             - "bar"
             - "lounge"
@@ -153,12 +164,17 @@ app:
             - "subscription"
             - "amazon prime"
             - "netflix"
-    - name: "Gym"
+            - "prime fitness"
+            - "gym plus"
+    - name: "Lifestyle"
       matches:
         - matchType: "CONTAINS"
           patterns:
-            - "prime fitness"
-            - "gym plus"
+            - "lego"
+            - "grooming"
+            - "arnotts"
+            - "penneys"
+            - "michael kors"
     - name: "Travel"
       matches:
         - matchType: "CONTAINS"
@@ -175,6 +191,12 @@ app:
         - matchType: "MATCHES"
           patterns:
             - "POS\\d{2}[A-Z]{3} Revolut"
-#        - matchType: "STARTS_WITH"
-#          patterns:
-#            - "365 Online"
+        - matchType: "STARTS_WITH"
+          patterns:
+            - "Revolut Bank UAB"
+            - "To "
+            - "Cash at "
+            - "Irish Stamp Duty for Cash at"
+            - "Auto Top-Up by"
+            - "Top-Up by"
+            - "Exchanged to"
