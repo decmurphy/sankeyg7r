@@ -1,13 +1,15 @@
-package xyz.decmurphy.sankeyg7r
+package xyz.decmurphy.sankeyg7r.categories
 
 import org.springframework.stereotype.Service
 import xyz.decmurphy.sankeyg7r.config.AppConfig
 
 @Service
-class Categoriser(
+class AppCategoriser(
     val appConfig: AppConfig
-) {
-    fun process(entry: String, isIncome: Boolean): AppCategory? {
+) : Categoriser {
+
+    override fun process(entry: String): Category? {
         return appConfig.categories.find { entry belongsTo it }
     }
+
 }

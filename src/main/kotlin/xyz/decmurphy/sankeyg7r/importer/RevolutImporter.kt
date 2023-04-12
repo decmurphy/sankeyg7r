@@ -1,11 +1,11 @@
-package xyz.decmurphy.sankeyg7r.import
+package xyz.decmurphy.sankeyg7r.importer
 
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.springframework.core.io.ResourceLoader
 import org.springframework.core.io.support.ResourcePatternUtils
 import org.springframework.stereotype.Service
-import xyz.decmurphy.sankeyg7r.Entry
+import xyz.decmurphy.sankeyg7r.Record
 import java.io.InputStreamReader
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -17,8 +17,8 @@ class RevolutImporter(
 
     val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
-    override fun readCsvFiles(): List<Entry> {
-        val entries = linkedSetOf<Entry>()
+    override fun readCsvFiles(): List<Record> {
+        val entries = linkedSetOf<Record>()
         val csvFormat = CSVFormat.DEFAULT.withFirstRecordAsHeader()
         val csvFolder = "classpath:transactions/revolut/*.csv"
 
@@ -52,14 +52,14 @@ class RevolutImporter(
 
                 val amount = record.get("Amount").toDouble()
                 val completedDate = record.get("Completed Date")
-                val initialEntry = Entry(
+                val initialRecord = Record(
                     LocalDate.parse(completedDate, dateFormatter),
                     description,
                     if (amount < 0.0) -amount else null,
                     if (amount > 0.0) amount else null,
                     record.get("Balance").toDoubleOrNull()
                 )
-                entries.add(initialEntry)
+                entries.add(initialRecord)
 
             }
         }

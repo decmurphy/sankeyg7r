@@ -5,8 +5,9 @@ import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
-import xyz.decmurphy.sankeyg7r.import.BOIImporter
-import xyz.decmurphy.sankeyg7r.import.RevolutImporter
+import xyz.decmurphy.sankeyg7r.categories.AppCategoriser
+import xyz.decmurphy.sankeyg7r.importer.BOIImporter
+import xyz.decmurphy.sankeyg7r.importer.RevolutImporter
 
 private val logger = KotlinLogging.logger {}
 
@@ -15,7 +16,7 @@ private val logger = KotlinLogging.logger {}
 class Sankeyg7rApplication(
 	val boiImporter: BOIImporter,
 	val revolutImporter: RevolutImporter,
-	val categoriser: Categoriser
+	val categoriser: AppCategoriser
 ) : CommandLineRunner {
 
 	override fun run(vararg args: String?) {
@@ -29,7 +30,7 @@ class Sankeyg7rApplication(
 		/**
 		 * Categorise
 		 */
-		val (categorised, uncategorised) = (boiTransactions + revolutTransactions).categorise()
+		val (categorised, uncategorised) = (boiTransactions + revolutTransactions).categoriseWith(categoriser)
 
 		/**
 		 * Print uncategorised entries
@@ -38,44 +39,21 @@ class Sankeyg7rApplication(
 			.groupBy { it.details }
 			.let { map -> map.keys.map { Pair(it, map[it]!!.fold(0.0) { acc, cur -> acc + (cur.debit ?: cur.credit!!) }) } }
 			.sortedByDescending { it.second }
-			.joinToString("") { pair -> "${pair.first} (x${pair.second})\n" }
-			.let { logger.info { "\nUncategorised Entries:\n$it" } }
+			.joinToString("", prefix = "\n\nUncategorized Entries:\n") { pair -> "${pair.first} (x${pair.second})\n" }
+			.apply { logger.info { this } }
 
 		/**
 		 * Sankify, Sort and Group by Period. Then group categorised entries by name, sort by amount, and print
 		 */
 		categorised
 			.filter { it.category?.name?.lowercase() != "ignore" }
-			.sankify()
+			.resolveSankeyInfo()
 			.sortedBy { it.date }
 			.groupBy { "${it.date.year}" } // group by year
-//			.groupBy { "${it.date.year}-${it.date.month}" } // group by month
-			.let { transactionsPerPeriod ->
-				transactionsPerPeriod.keys
-					.joinToString("") { period ->
-						transactionsPerPeriod[period]!!
-							.groupByName()
-							.sortedByDescending { it.sankey!!.amount }
-							.stringify("\n// $period\n")
-					}
-			}
-			.let { logger.info { it } }
+			.sankify()
+			.joinToString("")
+			.apply { logger.info { this } }
 
-	}
-
-	fun List<Entry>.categorise(): Pair<List<Entry>, List<Entry>> {
-
-		val uncategorisedEntries = mutableListOf<Entry>()
-
-		val categorisedEntries = this
-			.onEach {
-				it.category = categoriser.process(it.details, it.credit != null)
-				if (it.category == null) {
-					uncategorisedEntries.add(it)
-				}
-			}
-
-		return Pair(categorisedEntries, uncategorisedEntries)
 	}
 }
 

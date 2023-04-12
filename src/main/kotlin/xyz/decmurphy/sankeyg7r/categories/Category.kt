@@ -1,4 +1,4 @@
-package xyz.decmurphy.sankeyg7r
+package xyz.decmurphy.sankeyg7r.categories
 
 enum class MatchType {
     MATCHES
@@ -23,7 +23,7 @@ data class Match(
     }
 }
 
-data class AppCategory(
+data class Category(
     val name: String,
     val matches: List<Match>
 ) {
@@ -32,4 +32,4 @@ data class AppCategory(
     }
 }
 
-infix fun String.belongsTo(category: AppCategory) = category.matches(this)
+infix fun String.belongsTo(category: Category) = category.matches(this)
