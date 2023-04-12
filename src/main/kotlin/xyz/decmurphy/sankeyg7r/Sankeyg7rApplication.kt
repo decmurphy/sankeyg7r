@@ -7,8 +7,6 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
 import xyz.decmurphy.sankeyg7r.import.BOIImporter
 import xyz.decmurphy.sankeyg7r.import.RevolutImporter
-import java.math.BigDecimal
-import java.math.RoundingMode
 
 private val logger = KotlinLogging.logger {}
 
@@ -17,81 +15,67 @@ private val logger = KotlinLogging.logger {}
 class Sankeyg7rApplication(
 	val boiImporter: BOIImporter,
 	val revolutImporter: RevolutImporter,
-	val balanceCalculator: BalanceCalculator,
 	val categoriser: Categoriser
 ) : CommandLineRunner {
-
-	val uncategorisedEntries = mutableListOf<Entry>()
 
 	override fun run(vararg args: String?) {
 
 		/**
 		 * Import all transactions
 		 */
-		val boiTransactions = boiImporter.readCsvFiles().reversed().populateBalances()
+		val boiTransactions = boiImporter.readCsvFiles()
 		val revolutTransactions = revolutImporter.readCsvFiles()
 
 		/**
-		 * Categorise, Sankify, Sort and Group by Month
+		 * Categorise
 		 */
-		val transactionsByMonth = (boiTransactions + revolutTransactions)
-			.categorise()
-			.sankify()
-			.sortedBy { it.date }
-			.groupBy { "${it.date.year}-${it.date.month}" }
+		val (categorised, uncategorised) = (boiTransactions + revolutTransactions).categorise()
 
 		/**
 		 * Print uncategorised entries
 		 */
-		uncategorisedEntries
-			.sortedByDescending { it.sankey!!.amount }
-			.fold("\nUncategorised Entries:\n") { acc, cur -> acc + cur.details + "\n" }
-			.let { logger.info { it } }
+		uncategorised
+			.groupBy { it.details }
+			.let { map -> map.keys.map { Pair(it, map[it]!!.fold(0.0) { acc, cur -> acc + (cur.debit ?: cur.credit!!) }) } }
+			.sortedByDescending { it.second }
+			.joinToString("") { pair -> "${pair.first} (x${pair.second})\n" }
+			.let { logger.info { "\nUncategorised Entries:\n$it" } }
 
 		/**
-		 * Group categorised entries by name, sort by amount, and print
+		 * Sankify, Sort and Group by Period. Then group categorised entries by name, sort by amount, and print
 		 */
-		transactionsByMonth.keys
-			.map { month ->
-				transactionsByMonth[month]!!
-					.groupByName()
-					.sortedByDescending { it.sankey!!.amount }
-					.stringify("\n// $month\n")
+		categorised
+			.filter { it.category?.name?.lowercase() != "ignore" }
+			.sankify()
+			.sortedBy { it.date }
+			.groupBy { "${it.date.year}" } // group by year
+//			.groupBy { "${it.date.year}-${it.date.month}" } // group by month
+			.let { transactionsPerPeriod ->
+				transactionsPerPeriod.keys
+					.joinToString("") { period ->
+						transactionsPerPeriod[period]!!
+							.groupByName()
+							.sortedByDescending { it.sankey!!.amount }
+							.stringify("\n// $period\n")
+					}
 			}
-			.reduce { acc, cur -> acc + cur.toString() + "\n" }
 			.let { logger.info { it } }
 
 	}
 
-	fun List<Entry>.populateBalances() = this.mapIndexed {
-			idx, el -> balanceCalculator.process(el, if (idx == 0) null else this[idx-1])
-	}
+	fun List<Entry>.categorise(): Pair<List<Entry>, List<Entry>> {
 
-	fun List<Entry>.categorise() = this.map {
-		it.category = categoriser.process(it.details, it.credit != null)
-		if (it.category == null) {
-			uncategorisedEntries.add(it)
-		}
-		it
-	}.filter { it.category?.name?.lowercase() != "ignore" }
+		val uncategorisedEntries = mutableListOf<Entry>()
 
-	fun List<Entry>.sankify() = this.onEach { it.sankify() }
-
-	fun List<Entry>.groupByName(): List<Entry> {
-		val groupedList = mutableMapOf<String, Entry>()
-		this.forEach {
-			val key = "${it.sankey!!.input}-${it.sankey!!.output}"
-			groupedList[key]?.let { existingEntry ->
-				existingEntry.sankey!!.amount = BigDecimal(existingEntry.sankey!!.amount + it.sankey!!.amount).setScale(2, RoundingMode.HALF_UP).toDouble()
-			} ?: run {
-				groupedList[key] = it
+		val categorisedEntries = this
+			.onEach {
+				it.category = categoriser.process(it.details, it.credit != null)
+				if (it.category == null) {
+					uncategorisedEntries.add(it)
+				}
 			}
-		}
-		return groupedList.values.toList()
-	}
 
-	fun List<Entry>.stringify(header: String?) = this.fold(header) {
-			acc, cur -> acc + cur.sankey.toString() + "\n"
+		return Pair(categorisedEntries, uncategorisedEntries)
 	}
 }
 
