@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConstructorBinding
 import xyz.decmurphy.sankeyg7r.categories.Category
 
 @ConstructorBinding
-@ConfigurationProperties(prefix = "app")
+@ConfigurationProperties
 @Qualifier("AppConfig")
 data class AppConfig(
     val categories: List<Category>
